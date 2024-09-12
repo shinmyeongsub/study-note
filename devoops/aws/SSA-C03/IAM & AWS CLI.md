@@ -85,3 +85,11 @@
   - Mobile SDKs (Android, iOS, ...)
   - IoT Device SDKs (Embedded C, Arduino, ...)
   - Example:AWS CLI is built on AWS SDK for Python
+
+### IAM Roles for Services
+- Some AWS service will need to perform actions on your behalf
+- To do so, we will assign permissions to AWS services with IAM Roles
+- Common roles :
+  - EC2 Instance Roles
+  - Lambda Function Roles
+  - Roles for ColudFormation
