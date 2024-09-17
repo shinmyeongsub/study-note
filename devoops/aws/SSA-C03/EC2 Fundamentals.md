@@ -203,3 +203,34 @@
 - Combine with Regional Reserved Instances and Savings Plans to benefit from billing discounts
 - You're charged at On-Demand rate whether you run instances or not
 - Suitable for short-term, uninterrupted workloads that needs to be in a specific AZ
+
+### EC2 Spot Instance Requests
+- Can get a discount of up to 90% compared to On-demand
+- Define <strong>max spot price</strong> and get the instance while <strong>current spot price < max</strong>
+  - The hourly spot price varies based on offer and capacity
+  - If the current spot price > your max price you can choose to <strong>stop</strong> or <strong>terminate</strong> your instance with a 2 miniutes grace period.
+- Other strategy: <strong>Spot Block</strong>
+  - "block" spot instance during a specified time frame (1 to 6 hours) without interruptions
+  - In rare situations, the instance may be reclaimed
+  - ---
+  Spot Blocks are no longer avilable to new AWS customers since July 1st 2021 And won't be supported after December 31 2022
+
+  Still, they *might* appear in the exam, so I won't remove this slide yet
+
+  ---
+
+- **Used for batch jobs, data analysis, or workload that are resilient to failures.**
+- **Not great for critical jobs or databases**
+
+### Spot Fleets
+- Spot Fleets = set of Spot Instances + (optional) On-Demand Instances
+- The Spot Fleet will  try to meet the target capacity with price constraints
+  - Define possible launch pools : instance type (m5.large), OS, Availability Zone
+  - Can have multiple launch pools, so that the fleet can choose
+  - Spot Fleet stops launching instances when reaching capacity or max cost
+- Strategies to allocate Spot Instances:
+  - **lowestPrice:** from the pool with the lowest price (cost optimization, short workload)
+  - **diversified:** distributed across all pools (great for availability, long workloads)
+  - **capacityOptimized:** pool with the optimal capacity fro the number of instances
+  - **priceCapacityOptimized (recommended):** pools with highest capacity available, then select the pool with the lowest price (best choice for most workloads)
+- **<u>Spot Fleets allow ust to automatically request Spot Instances with the lowest price</u>**
