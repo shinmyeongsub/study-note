@@ -47,3 +47,100 @@
 - **Public Hosted Zones** - contains records that specify how to route traffic on the Internet (public domain names)
 - **Private Hosted Zones** - contain records that specify how you route traffic within one or more VPCs (private domain names)
 - You pay $0.50 per month per hosted zone
+
+### Route 53 - Records TTL (Time To Live)
+- **High TTL - e.g., 24hr**
+  - Less traffic on Route 53
+  - Possibly outdated records
+- **Low TTL - e.g., 60 sec.**
+  - More traffic on Route 53 ($$)
+  - Records are outdated for less time
+  - Easy to change records
+- **Except for Alias records, TTL is mandatory for each DNS record**
+
+### CNAME vs Alias
+- AWS Resources (Load Balancer, CloudFront...) expose an AWS hostname:
+  - lb 1-1234.us-east-2.elb.amazonaws.com and you want myapp.mydomain.com
+- CNAME:
+  - Points a hostname to any other hostname. (app.mydomain.com => blabla.anything.com)
+  - **<u>ONLY FOR NON ROOT DOMAIN (aka.something.mydomain.com)</u>**
+- Alias:
+  - Points a hostname to an AWS Resource (app.mydomain.com => blabla.amazonaws.com)
+  - **<u>Works for ROOT DOMAIN and NON ROOT DOMAIN (aka mydomain.com)</u>**
+  - Free of charge
+  - Native health check
+
+### Route 53 - Alias Records
+- Maps a hostname to an AWS resource
+- An extension to DNS functionality
+- Automatically recognizes changes in the resource's IP addresses
+- Unlike CNAME, it can be used for the top node of a DNS namespace (Zone Apex), e.g.: example.com
+- Alias Record is always of type A/AAAA for AWS resources (IPv4 / IPv6)
+
+### Route 53 - Alias Records Targets
+- Elastic Load Balancers
+- CloudFront Distributions
+- API Gateway
+- Elastic Beanstalk environments
+- S3 Websites
+- VPC Interface Endpoints
+- Global Accelerator accelerator
+- Route 53 record in the smae hosted zone
+
+- **You cannot set an ALIAS record for an EC2 DNS name**
+- Define how Route 53 responds to DNS quries
+- Don't get confused by the word "*Routing*"
+  - It's not the same as Load balancer routing which routes the traffic
+  - DNS does not route any traffic, it only responds to the DNS queries
+- Route 53 Supports the following Routing Policies
+  - Simple
+  - Weighted
+  - Failover
+  - Latency based
+  - Geolocation
+  - Multi-Value Answer
+  - Geoproximity (using Route 53 Traffic Flow feature)
+
+### Routing Policies - Simple
+- Typically, route traffic to a single resource
+- Can specify multiple values in the same record
+- **If multiple values are returned, a random one is chosen by the <u>client</u>**
+- When Alias enabled, specify only one AWS resource
+- Can't be associated with Health Checks
+
+### Routing Policies - Weighted
+- Control the % of the requests that go to each specific resource
+- Assign each record a relative weight:
+  - *traffic (%) = Weight for a specific record / Sum of all the weights for all records*
+  - Weights don't need to sum up to 100
+- DNS records must have the same name and type
+- Can be associated with Health Checks
+- Use cases: load balancing between regions, testing new application versions...
+- **Assign a weight of 0 to a record to stop sending traffic to a resource**
+- **If all records have weight of 0, then all records will be returned equally**
+
+### Routing Policies - Latency based
+- Redirect to the resource that has the least latency close to us
+- Super helpful when latency for users is a priority
+- **Latency is based on traffic between users and AWS Regions**
+- Germany users may be directed to the US (if that's the lowest latency)
+- Can be associated with Health Checks (has a failover capability)
+
+### Route 53 - Health Checks
+- HTTP Health Checks are only for **public resources**
+- **Health Check => Automated DNS Failover:**
+  - Health Check that monitor an endpoint (application, server, other AWS resource)
+  - Health checks that monitor other health checks (Calculated Health Checks)
+  - Health checks that monitor CloudWatch Alarms (full control !!) - e.g., throttles of DynamoDB, alarms on RDS, custom metrics, ... (helpful for private resources)
+- **Health Checks are integrated with CW metrics**
+
+### Health Checks - Monitor an Endpoint
+- **About 15 global health checkers will check the endpoint health**
+  - Healthy/Unhealthy Threshold - 3 (default)
+  - Interval - 30 sec (can set to 10 sec - higher cost)
+  - Supported protocol : HTTP, HTTPS and TCP
+  - If > 18% of health checkers report the endpoint is healthy, Route 53 considers it **Healthy**. Otherwise, it's **Unhealthy**
+  - Ability to choose which locations you want Route 53 to use
+- Health Checks pass only when the endpoint responds with the 2xx and 3xx status codes
+- Health Checks can be setup to pass / fail based on the text in the first 5120 bytes of the response
+- Configure you router/firewall to allow incoming requests from Route 53 Health Checkers
