@@ -144,3 +144,15 @@
 - Health Checks pass only when the endpoint responds with the 2xx and 3xx status codes
 - Health Checks can be setup to pass / fail based on the text in the first 5120 bytes of the response
 - Configure you router/firewall to allow incoming requests from Route 53 Health Checkers
+
+### Route 53 - Calculated Health Checks
+- Combine the results of multiple Health Checks into a single Health Check
+- You can use **OR, AND,** or **NOT**
+- Can monitor up to 256 Child Health Checks
+- Specify how many of the health checks need to pass to make the parent pass
+- Usage: perform maintenance to your website without causing all health checks to fail
+
+### Health Checks - Private Hosted Zones
+- Route 53 health checkers are outside the VPC
+- They can't access **private** endpoints (private VPC or on-premises resource)
+- You can create a **CloudWatch Metric** and associate a **CloudWatch Alarm**, then create a Health Check that checks the alarm itself
