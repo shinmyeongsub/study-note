@@ -156,3 +156,50 @@
 - Route 53 health checkers are outside the VPC
 - They can't access **private** endpoints (private VPC or on-premises resource)
 - You can create a **CloudWatch Metric** and associate a **CloudWatch Alarm**, then create a Health Check that checks the alarm itself
+
+### Routing Policies - Geolocation
+- Different from Latency-based!
+- **This routing is based on user location**
+- Specify location by Continent, Country or by US State (if there's overlapping, most precise location selected)
+- Should create a **"Default"** record (in case there's no match on location)
+- Use cases: website localization, restrict content distribution, load balancing, ...
+- Can be associated with Health Checks
+
+### Geoproximity Routing Policy
+- Route traffic to your resources based on the geographic location of users and resources
+- Ability **to shift more traffic to resources based** on the defined **bias**
+- To change the size of the geographic region, specify **bias** values:
+  - To expand (1 to 99) - more traffic to the resource
+  - To shrink (-1 to -99) - less traffic to the resource
+- Resources can be:
+  - AWS resources (specify AWS region)
+  - Non-AWS resources (specify Latitude and Longitude)
+- You must use Route 53 Traffic Flow (advanced) to use this feature
+
+### Routing Policies - IP - based Routing
+- **Routing is based on clients'IP addresses**
+- **You provide a list of CIDRs for your clients** and the corresponding endpoints/locations (user-IP-to-endpoint mappings)
+- Use cases: Optimize performance, reduce network costs...
+- Example:route end users from a particular ISP to a specific endpoint
+
+### Routing Policies - Multi-Value
+- Use when routing traffic to multiple resources
+- Route 53 return multiple values/resources
+- Can be associated with Health Checks (return only values for healthy resources)
+- Up to 8 healthy records are returned for each Multi-Value query
+- **Multi-Value is not a substitute for having an ELB**
+
+### Domain Register vs. DNS Service
+- You buy or register your domain name with a Domain Registrar typically by paying annual charges (e.g., GoDaddy, Amazon Registrar Inc., ...)
+- The Domain Registrar usually provides you with a DNS service to manage your DNS records
+- But you can use another DNS service to manage your DNS records
+- Example: purchase the domain from GoDaddy and use Route 53 to manage your DNS records
+
+### 3rd Party Registrar with Aamazon Route 53
+- **If you buy your domain on a 3rd party registrar, you can still use Route 53 as the DNS Service provider**
+
+1. Create a Hosted Zone in Route 53
+2. Update NS Records on 3rd party website to use Route 53 **Name Servers**
+
+- **Domain Registrar != DNS Service**
+- But every Domain Registrar usually comes with some DNS features
